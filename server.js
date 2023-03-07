@@ -2,13 +2,12 @@ const mongoose = require("mongoose");
 
 const app = require("./app");
 
-const BD_HOST =
-  "mongodb+srv://oksanarobeiko:jrcfyf99@cluster0.gbbcn6s.mongodb.net/db-contacts?retryWrites=true&w=majority";
+const { DB_HOST } = process.env;
 
 mongoose.set("strictQuery", true);
 
 mongoose
-  .connect(BD_HOST)
+  .connect(DB_HOST)
   .then(() => {
     app.listen(3000);
     console.log("Database connection successful");
