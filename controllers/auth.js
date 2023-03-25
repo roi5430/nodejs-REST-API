@@ -1,7 +1,12 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
-const { User, registerSchema, loginSchema } = require("../models/user");
+const {
+  User,
+  registerSchema,
+  loginSchema,
+  updateSubscriptionSchema,
+} = require("../models/user");
 const { HttpError, ctrlWrapper } = require("../helpers/index");
 const { SECRET_KEY } = process.env;
 
@@ -37,7 +42,7 @@ const login = async (req, res) => {
     throw HttpError(400, "Error from Joi. Check your email or password");
   }
 
-  const { email, password } = req.body;
+  const { email, password, subscription } = req.body;
   const user = await User.findOne({ email });
   if (!user) {
     throw HttpError(401, "Email or password is wrong");
@@ -59,6 +64,8 @@ const login = async (req, res) => {
 
   res.json({
     token,
+    email: user.email,
+    subscription: user.subscription,
   });
 };
 
@@ -77,9 +84,26 @@ const logout = async (req, res) => {
   res.json();
 };
 
+const updateUserSubscription = async (req, res) => {
+  const { error } = updateSubscriptionSchema.validate(req.body);
+  if (error) {
+    throw HttpError(400, "missing field subscription");
+  }
+
+  const { _id } = req.user;
+  const result = await User.findByIdAndUpdate(_id, req.body, {
+    new: true,
+  });
+  if (!result) {
+    throw HttpError(404, "Not found");
+  }
+  res.json(result);
+};
+
 module.exports = {
   register: ctrlWrapper(register),
   login: ctrlWrapper(login),
   current: ctrlWrapper(current),
   logout: ctrlWrapper(logout),
+  subscription: ctrlWrapper(updateUserSubscription),
 };
