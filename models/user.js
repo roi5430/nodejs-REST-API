@@ -22,7 +22,10 @@ const UserSchema = new Schema({
     enum: ["starter", "pro", "business"],
     default: "starter",
   },
-  token: String,
+  token: {
+    type: String,
+    default: "",
+  },
 });
 
 UserSchema.post("save", mongooseError);
