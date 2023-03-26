@@ -31,6 +31,7 @@ const getById = async (req, res) => {
   const { _id: owner } = req.user;
   const { contactId } = req.params;
   const result = await Contact.findOne({ _id: contactId, owner: owner });
+
   if (!result) {
     throw HttpError(404, "Not found");
   }
@@ -40,6 +41,7 @@ const getById = async (req, res) => {
 const addContact = async (req, res) => {
   const { _id: owner } = req.user;
   const { error } = JoiSchema.validate(req.body);
+
   if (error) {
     throw HttpError(400, "missing required name field");
   }
