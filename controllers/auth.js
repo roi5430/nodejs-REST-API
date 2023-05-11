@@ -45,13 +45,13 @@ const login = async (req, res) => {
   const { email, password, subscription } = req.body;
   const user = await User.findOne({ email });
   if (!user) {
-    throw HttpError(401, "Email or password is wrong");
+    throw HttpError(401, "Email is wrong");
   }
 
   const passwordCompare = await bcrypt.compare(password, user.password);
 
   if (!passwordCompare) {
-    throw HttpError(401, "Email or password is wrong");
+    throw HttpError(401, "Password is wrong");
   }
 
   const payload = {
@@ -81,7 +81,7 @@ const logout = async (req, res) => {
   const { _id } = req.user;
   await User.findByIdAndUpdate(_id, { token: "" });
 
-  res.json();
+  res.json({ message: "user logout" });
 };
 
 const updateUserSubscription = async (req, res) => {
