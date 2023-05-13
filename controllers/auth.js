@@ -1,5 +1,9 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const gravatar = require("gravatar");
+const path = require("path");
+const fs = require("fs/promises");
+const Jimp = require("jimp");
 
 const {
   User,
@@ -9,6 +13,7 @@ const {
 } = require("../models/user");
 const { HttpError, ctrlWrapper } = require("../helpers/index");
 const { SECRET_KEY } = process.env;
+const avatarsDir = path.join(__dirname, "../", "public", "avatars");
 
 const register = async (req, res) => {
   const { error } = registerSchema.validate(req.body);
@@ -23,10 +28,12 @@ const register = async (req, res) => {
   }
 
   const createHashPassword = await bcrypt.hash(password, 10);
+  const avatarURL = gravatar.url(email);
 
   const newUser = await User.create({
     ...req.body,
     password: createHashPassword,
+    avatarURL,
   });
 
   res.status(201).json({
@@ -100,10 +107,35 @@ const updateUserSubscription = async (req, res) => {
   res.json(result);
 };
 
+const updateAvatar = async (req, res) => {
+  const { _id } = req.user;
+  const { path: tmpApload, originalname } = req.file;
+  const filename = `${_id}_${originalname}`;
+
+  const resultUpload = path.join(avatarsDir, filename);
+  await fs.rename(tmpApload, resultUpload);
+  const avatarURL = path.join("avatars", filename);
+  await User.findByIdAndUpdate(_id, { avatarURL });
+
+  if (!_id) {
+    throw HttpErorr(401, "Not authorized");
+  }
+
+  const formatFile = async () => {
+    const image = await Jimp.read(resultUpload);
+    image.resize(250, 250);
+    image.write(resultUpload);
+  };
+  formatFile();
+
+  res.json({ avatarURL });
+};
+
 module.exports = {
   register: ctrlWrapper(register),
   login: ctrlWrapper(login),
   current: ctrlWrapper(current),
   logout: ctrlWrapper(logout),
   subscription: ctrlWrapper(updateUserSubscription),
+  updateAvatar: ctrlWrapper(updateAvatar),
 };
