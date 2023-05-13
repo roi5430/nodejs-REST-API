@@ -26,7 +26,10 @@ const UserSchema = new Schema({
     type: String,
     default: "",
   },
-  avatarURL: String,
+  avatarURL: {
+    type: String,
+    require: true,
+  },
 });
 
 UserSchema.post("save", mongooseError);
