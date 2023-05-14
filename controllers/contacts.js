@@ -108,39 +108,3 @@ module.exports = {
   updateStatusContact: ctrlWrapper(updateStatusContact),
   deleteContact: ctrlWrapper(deleteContact),
 };
-
-//   const { favorite, email, page = 1, limit = 10 } = req.query;
-//   const filter = {};
-
-//   if (favorite === "true") {
-//     filter.favorite = true;
-//   } else if (favorite === "false") {
-//     filter.favorite = false;
-//   }
-
-//   if (email === "true") {
-//     filter.email = true;
-//   } else if (email === "false") {
-//     filter.email = false;
-//   }
-
-//   const skip = (page - 1) * limit;
-//   const count = await Contact.countDocuments(filter);
-//   const pages = Math.ceil(count / limit);
-
-//   Contact.find(filter)
-//     .skip(skip)
-//     .limit(parseInt(limit))
-//     .then((contacts) => {
-//       res.status(200).json({
-//         data: contacts,
-//         page: parseInt(page),
-//         pages: pages,
-//         total: count,
-//       });
-//     })
-//     .catch((error) => {
-//       console.error(error);
-//       res.status(500).json({ message: "Server error" });
-//     });
-// };
